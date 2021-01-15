@@ -8,84 +8,91 @@ var ghost = {
 };
 
 var score = 0;
-var level = 1;
+var level = 5;
 var img;
-var time = 28;
+var time = 23;
 var frame = 0;
-var showDemon = false;
-let cackle;
-
-function preload() {
-  soundFormats('mp3');
-  cackle = loadSound('sound/cackle3.mp3');
-}
+var caught = 0;
+var restartButton;
+var won = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   img = loadImage("pics/ghost.png");
-  demonImg = loadImage("pics/demon.jpg");
 }
 
 function draw() {
-  //cackle.play();
-  
+  // the level trasitions
   switch(level) {
-    case 0:
-      levelZero();
-      //if (mouseIsPressed) {
-      //  frames += 1;
-      //  time = 0;
-      //}
-      break;
+    case -1:
+      gameOver();
+
+      break; 
+    //case 0:
+    //  levelZero();
+      
+    //  break;
     case 1:
-      if (time > 25) {
+      background(225);
+      fill(0);
+      if (time > 21) {
         // title screen
         textAlign(CENTER, CENTER);
-        fill(225, 0, 0);
         text("level one", width/2, height/2);
-        text("catch 20 ghosts before time runs out", width/2, height/2+15 );
+        text("catch at least 15 ghosts before time runs out", width/2, height/2+15 );
       } else {
         levelOne();
       }
       break;
     case 2:
-      if (time > 20) {
+      background(225);
+      fill(0);
+      if (time > 21) {
+        // title screen
         textAlign(CENTER, CENTER);
         text("level two", width/2, height/2);
-        text("the ghosts can hide now! catch 20 more ghosts.", width/2, height/2+15 );
+        text("the ghosts can hide now! catch 15 more ghosts.", width/2, height/2+15 );
       } else {
         levelTwo();
       }
       break;
     case 3:
-      if (time > 20) {
+      background(0);
+      fill(225);
+      if (time > 26) {
         textAlign(CENTER, CENTER);
         text("level three", width/2, height/2);
-        text("catch 20 more ghosts but this time the light are out!", width/2, height/2+15 );
+        text("catch 10 more ghosts but this time the light are out, so use a flashlight!", width/2, height/2+15 );
       } else {
         levelThree();
       }
       break;
     case 4:
-    if (time > 20) {
-      textAlign(CENTER, CENTER);
-      text("level four", width/2, height/2);
-      } else {
-      levelFour();
-    }
+      background(0);
+      fill(225);
+      if (time > 26) {
+        textAlign(CENTER, CENTER);
+        text("level four", width/2, height/2);
+        text("catch 15 more ghosts", width/2, height/2+15 );
+        } else {
+        levelFour();
+      }
       break;
     case 5:
-      if (time > 20) {
+      background(0);
+      fill(225);
+      if (time > 19) {
         textAlign(CENTER, CENTER);
-        text("level five", width/2, height/2);
-        text("catch 20 more ghosts", width/2, height/2+15 );
+        text("FINAL ROUND", width/2, height/2);
+        text("catch at least 10 more ghosts to win", width/2, height/2+15 );
       } else {
         levelFive();
       }
       break;
   }
+
+  // the time functions
   frame += 1;
-  //first level of the game
   if (frame === 60) {
     frame = 0;
     time -= 1;
@@ -115,11 +122,12 @@ function display(obj) {
   textSize(20);
   textAlign(LEFT, BOTTOM);
   fill(225, 0, 0);
-  text("ghosts caught: "+ score, width-170, 30);
+  text("Total score: "+ score, width-142, 30);
+  text ("ghosts caught: " + caught, width-170, 50);
   text("Time Left: " + time, 10, 30);
-  if (showDemon) {
-    image(demonImg, 0, 0, width, height);
-  }
+  //noCursor();
+  //fill(0, 225, 0);
+  //ellipse(mouseX, mouseY, 20, 20);
 }
 
 function pressed(obj) {
@@ -131,14 +139,42 @@ function pressed(obj) {
     obj.y = random(1, height-ghost.h);
     
     score++;
+    caught++;
   }
 }
 
-function levelZero() {
+function restart() {
   score = 0;
+  level = 1;
+  time = 17;
+  caught = 0;
+  restartButton.hide();
+}
+
+function gameOver() {
+  //score = 0;
   time = 0;
   textAlign(CENTER, CENTER);
-  text("GAME OVER.", width/2, height/2);
+  background(0);
+  fill(225, 0, 0);
+  if (won) {
+    background(225);
+    fill(0);
+    text("YOU WON!", width/2, height/2);
+  } else {
+    background(0);
+    fill(225, 0, 0);
+    textSize(20);
+    text("GAME OVER.", width/2, height/2);
+  }
+  text("total ghosts caught: " + score, width/2, height/2+20);
+  if (!restartButton) {
+    restartButton = createButton('press to restart game');
+    restartButton.position(width/2-restartButton.width/2, height/2+restartButton.height+15);
+    restartButton.mousePressed(restart);
+  } else {
+    restartButton.show();
+  }
 }
 
 function levelOne() {
@@ -157,21 +193,19 @@ function levelOne() {
   // shape
   display(ghost);
 
-  if (score === 20) {
+if (caught > 14 && time === 0) {
     // win condition
     time = 23;
     level = 2;
+    caught = 0;
   } else if (time === 0) {
     // lose condition
-    level = 0;
+    level = -1;
   }
 }
 
 function levelTwo() {
-  // background
-  background(225, 225, 225);
-
-  // obsticle
+   // obsticle
   fill(0, 0, 0);
   ellipse(width-250, height-300, 40, 40);
   ellipse(width-200, height-100, 80, 80);
@@ -196,33 +230,21 @@ function levelTwo() {
   // shape
   display(ghost);
 
-  if (score === 40) {
+  if (caught > 14 && time === 0) {
     // win condition
-    time = 23;
+    time = 28;
     level = 3;
+    caught = 0;
   } else if (time === 0) {
     // lose condition
-    level = 0;
+    level = -1;
   }
 }
 
 function levelThree() {
-  // background
-  background(0, 0, 0);
-
-  // light spot
-  fill(225, 225, 225);
-  ellipse(width-200, height-200, 100, 100);
-  ellipse(width-400, height-400, 150, 50);
-  ellipse(width-75, height-400, 100, 125);
-  ellipse(width-400, height-100, 125, 125);
-  ellipse(width-400, height-250, 100, 75);
-  ellipse(width-975, height-100, 150, 125);
-  ellipse(width-860, height-300, 100, 150);
-  ellipse(width-675, height-200, 200, 100);
-  ellipse(width-500, height-200, 100, 90);
-  ellipse(width-750, height-400, 100, 95);
-  ellipse(width-75, height-100, 150, 150);
+   // light spot
+  fill(203, 217, 15);
+  ellipse(mouseX, mouseY, 400, 400);
 
   // mouse is touching ghost
   pressed(ghost);
@@ -234,31 +256,24 @@ function levelThree() {
   bounce(ghost);
 
   // shape
+  fill (225, 225, 225)
   display(ghost);
 
-  if (time === 15 && frame === 30) {
-    cackle.play();
-    showDemon = true;
-    level = 0;
-  }
-
-  if (score === 60) {
+  if (caught > 9 && time === 0) {
     // win condition
-    time = 23;
+    time = 28;
     level = 4;
+    caught = 0;
   } else if (time === 0) {
     // lose condition
-    level = 0;
+    level = -1;
   }
 }
 
 function levelFour() {
-  // background
-  background(0, 0, 0);
-
   // light spot
   fill(203, 217, 15);
-  ellipse(mouseX, mouseY, 100, 100);
+  ellipse(mouseX, mouseY,300, 300);
 
   // mouse is touching ghost
   pressed(ghost);
@@ -273,23 +288,21 @@ function levelFour() {
   fill (225, 225, 225)
   display(ghost);
 
-  if (score === 80) {
+  if (caught > 14 && time === 0) {
     // win condition
     time = 23;
     level = 5;
+    caught = 0;
   } else if (time === 0) {
     // lose condition
-    level = 0;
+    level = -1;
   }
 }
 
 function levelFive() {
-  // background
-  background(0, 0, 0);
-
   // light spot
   fill(203, 217, 15);
-  ellipse(mouseX, mouseY, 50, 50);
+  ellipse(mouseX, mouseY, 150, 150);
 
   // mouse is touching ghost
   pressed(ghost);
@@ -304,34 +317,12 @@ function levelFive() {
   fill (225, 225, 225)
   display(ghost);
 
-  if (score === 100) {
+  if (caught > 9 && time === 0) {
     // win condition
-    time = 23;
-    level = 6;
+    won = true;
+    level = -1;
   } else if (time === 0) {
     // lose condition
-    level = 0;
+    level = -1;
   }
-}
-
-function levelSix() {
-  // background
-  background(0, 0, 0);
-
-  // light spot
-  fill(225, 225, 225);
-  
-
-  // mouse is touching ghost
-  pressed(ghost);
-
-  //  moves ball
-  move(ghost);
-
-  // bounces ball when hits wall
-  bounce(ghost);
-
-  // shape
-  fill (225, 225, 225)
-  display(ghost);
 }
