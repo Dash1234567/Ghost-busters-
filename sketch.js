@@ -8,13 +8,14 @@ var ghost = {
 };
 
 var score = 0;
-var level = 5;
+var level = 0;
 var img;
 var time = 23;
 var frame = 0;
 var caught = 0;
 var restartButton;
 var won = false;
+var startButton;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -25,13 +26,15 @@ function draw() {
   // the level trasitions
   switch(level) {
     case -1:
+      background(0);
       gameOver();
 
       break; 
-    //case 0:
-    //  levelZero();
+    case 0:
+      background(225);
+      gameStart();
       
-    //  break;
+      break;
     case 1:
       background(225);
       fill(0);
@@ -99,6 +102,10 @@ function draw() {
   }
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 function bounce(obj) {
   // right wall or left wall
   if (obj.x > width-obj.w || obj.x < 0){ 
@@ -146,16 +153,14 @@ function pressed(obj) {
 function restart() {
   score = 0;
   level = 1;
-  time = 17;
+  time = 23;
   caught = 0;
   restartButton.hide();
 }
 
 function gameOver() {
-  //score = 0;
   time = 0;
   textAlign(CENTER, CENTER);
-  background(0);
   fill(225, 0, 0);
   if (won) {
     background(225);
@@ -175,6 +180,28 @@ function gameOver() {
   } else {
     restartButton.show();
   }
+}
+
+function start() {
+  score = 0;
+  level = 1;
+  time = 23;
+  caught = 0;
+  startButton.hide();
+}
+
+function gameStart() {
+  textAlign(CENTER, CENTER);
+  textSize(30);
+  text("Ghost Busters by: Dashel Taira", width/2, height/2);
+  if (!startButton) {
+    startButton = createButton('press to start game');
+    startButton.position(width/2-startButton.width/2, height/2+startButton.height+15);
+    startButton.mousePressed(start);
+  } else {
+    startButton.show();
+  }
+
 }
 
 function levelOne() {
@@ -207,16 +234,17 @@ if (caught > 14 && time === 0) {
 function levelTwo() {
    // obsticle
   fill(0, 0, 0);
-  ellipse(width-250, height-300, 40, 40);
-  ellipse(width-200, height-100, 80, 80);
-  ellipse(width-400, height-400, 90, 80);
-  ellipse(width-450, height-150, 100, 100);
-  ellipse(width-100, height-400, 120, 90);
-  ellipse(width-990, height-200, 200, 150);
-  ellipse(width-790, height-100, 50, 100);
-  ellipse(width-680, height-300, 100, 50);
-  ellipse(width-550, height-400, 50, 100);
-  ellipse(width-200, height-200, 100, 100);
+  // TODO: responsive obstacles
+  // ellipse(width-250, height-300, 40, 40);
+  // ellipse(width-200, height-100, 80, 80);
+  // ellipse(width-400, height-400, 90, 80);
+  // ellipse(width-450, height-150, 100, 100);
+  // ellipse(width-100, height-400, 120, 90);
+  // ellipse(width-990, height-200, 200, 150);
+  // ellipse(width-790, height-100, 50, 100);
+  // ellipse(width-680, height-300, 100, 50);
+  // ellipse(width-550, height-400, 50, 100);
+  // ellipse(width-200, height-200, 100, 100);
 
   // mouse is touching ghost
   pressed(ghost);
